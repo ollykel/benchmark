@@ -34,14 +34,16 @@ func GetExecutableName (name string) (string, error) {
 func main () {
 	if len(os.Args) < 2 {
 		fmt.Fprint(os.Stderr,
-			"\x1b[32mbenchmark requires at least one arg\x1b[0m\n")
+			"\x1b[31mbenchmark requires at least one arg\x1b[0m\n")
 		os.Exit(1)
 	}
 	procName, err := GetExecutableName(os.Args[1])
 	if err != nil { log.Fatal(err) }
 	fmt.Fprintf(os.Stderr, "\x1b[32mBenchmarking %s...\x1b[0m\n", procName)
+	attribs := os.ProcAttr{
+		Files: []*os.File{ os.Stdin, os.Stdout, os.Stderr }}
 	start := time.Now()
-	proc, err := os.StartProcess(procName, os.Args[1:], nil)
+	proc, err := os.StartProcess(procName, os.Args[1:], &attribs)
 	if err != nil { log.Fatal(err) }
 	_, err = proc.Wait()
 	if err != nil { log.Fatal(err) }
